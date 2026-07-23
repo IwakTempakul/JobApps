@@ -15,7 +15,7 @@
   }
 .container {
     width: 100%;
-    max-width: 750px; /* FORM TETAP ADAPTIF */
+    max-width: 750px;
     background: white;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
@@ -57,17 +57,36 @@
     backdrop-filter: blur(2px);
   }
 
-  /* KUNCI BUAT HASIL KAYAK PDF */
-.paper-canvas {
-    width: 100%;
-    overflow-x: auto; /* BISA GESER KALAU LEBAR */
-    padding: 10px 0;
-    background: #ddd; /* BACKGROUND ABU2 KAYAK APLIKASI PDF */
+  /* KONTROL ZOOM & ROTATE */
+.toolbar {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 10px;
+    background: #eee;
+    padding: 8px;
     border-radius: 8px;
   }
+.toolbar button {
+    padding: 8px 12px;
+    font-size: 13px;
+    background: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+.paper-canvas {
+    width: 100%;
+    overflow: auto; /* BISA SCROLL 4 ARAH */
+    background: #ddd;
+    border-radius: 8px;
+    height: 600px; /* TINGGI VIEWPORT DI HP */
+  }
 .paper {
-    width: 750px; /* UKURAN KERTAS DIKUNCI */
-    min-height: 1056px; /* TINGGI KAYA A4 */
+    width: 750px;
+    min-height: 1056px;
     margin: 0 auto;
     background: #fefcf3;
     background-image: repeating-linear-gradient(#cce0ff 0px, #cce0ff 1px, transparent 1px, transparent 28px);
@@ -78,7 +97,9 @@
     text-align: justify;
     font-family: Arial, sans-serif;
     box-sizing: border-box;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2); /* BAYANGAN KAYAK KERTAS */
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    transform-origin: top center; /* TITIK ZOOM DARI ATAS */
+    transition: transform 0.2s;
   }
 .title {
     text-align: center;
@@ -96,7 +117,7 @@
     justify-content: space-between;
     margin-top: 20px;
   }
-  button {
+  button.main-btn {
     padding: 12px 24px;
     border: none;
     border-radius: 8px;
@@ -126,10 +147,11 @@
   }
 
 @media print {
+ .toolbar { display: none; }
   body { background: white; padding: 0; }
 .container { box-shadow: none; max-width: 100%; padding: 0; }
-.paper-canvas { background: white; overflow: visible; }
-.paper { width: 100%; min-height: auto; box-shadow: none; }
+.paper-canvas { background: white; overflow: visible; height: auto; }
+.paper { width: 100%; min-height: auto; box-shadow: none; transform: none!important; }
 }
 </style>
 </head>
@@ -137,7 +159,7 @@
 
 <div class="container">
 
-  <!-- SLIDE 1: INPUT DATA - ADAPTIF -->
+  <!-- SLIDE 1: INPUT DATA -->
   <div class="slide active" id="slide1">
     <h2>Isi Data Surat Lamaran</h2>
     <div class="form-group"><label>1. Siapa Nama Lengkapmu?</label><input type="text" id="nama" placeholder="Contoh: Budi Santoso"></div>
@@ -149,17 +171,23 @@
     <div class="form-group"><label>7. Posisi apa yang kamu lamar?</label><input type="text" id="posisi" placeholder="Contoh: Staff Admin"></div>
     <div class="form-group"><label>8. Jurusan apa yang kamu ambil di sekolah?</label><input type="text" id="jurusan" placeholder="Contoh: TKJ / RPL / DKV / OTKP"></div>
 
-    <div class="btn-group"><div></div><button class="btn-next" onclick="nextSlide()">Next →</button></div>
+    <div class="btn-group"><div></div><button class="main-btn btn-next" onclick="nextSlide()">Next →</button></div>
   </div>
 
-  <!-- SLIDE 2: HASIL SURAT - KAYAK PDF -->
+  <!-- SLIDE 2: HASIL SURAT -->
   <div class="slide" id="slide2">
-    <div class="paper-canvas"> <!-- INI KANVASNYA BISA DI ZOOM -->
+    <div class="toolbar">
+      <button onclick="zoomOut()">- Zoom 50%</button>
+      <button onclick="zoomReset()">100%</button>
+      <button onclick="zoomIn()">+ Zoom</button>
+      <button onclick="rotatePaper()">🔄 Putar</button>
+    </div>
+    <div class="paper-canvas" id="canvas">
       <div class="paper" id="hasilSurat"></div>
     </div>
     <div class="btn-group">
-      <button class="btn-back" onclick="backSlide()">← Kembali</button>
-      <button class="btn-print" onclick="window.print()">Print / Simpan PDF</button>
+      <button class="main-btn btn-back" onclick="backSlide()">← Kembali</button>
+      <button class="main-btn btn-print" onclick="window.print()">Print / Simpan PDF</button>
     </div>
   </div>
 
@@ -168,6 +196,36 @@
 </div>
 
 <script>
+  let currentScale = 1;
+  let currentRotate = 0;
+
+  function applyTransform() {
+    document.getElementById('hasilSurat').style.transform = `scale(${currentScale}) rotate(${currentRotate}deg)`;
+  }
+
+  function zoomIn() {
+    if(currentScale < 2) { // max 200%
+      currentScale += 0.1;
+      applyTransform();
+    }
+  }
+  function zoomOut() {
+    if(currentScale > 0.5) { // min 50%
+      currentScale -= 0.1;
+      applyTransform();
+    }
+  }
+  function zoomReset() {
+    currentScale = 1;
+    currentRotate = 0;
+    applyTransform();
+  }
+  function rotatePaper() {
+    currentRotate += 90; // putar 90 derajat
+    if(currentRotate >= 360) currentRotate = 0;
+    applyTransform();
+  }
+
   function nextSlide() {
     const data = {
       nama: document.getElementById('nama').value || '[Your Full Name]',
@@ -199,6 +257,7 @@
 
     document.getElementById('slide1').classList.remove('active');
     document.getElementById('slide2').classList.add('active');
+    zoomReset(); // reset pas buka
   }
 
   function backSlide() {
