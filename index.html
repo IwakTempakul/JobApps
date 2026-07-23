@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=750, user-scalable=yes, initial-scale=1.0"> <!-- KUNCI LEBAR 750px -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"> <!-- FORM TETAP ADAPTIF -->
 <title>Generator Surat Lamaran</title>
 <style>
   body {
@@ -12,11 +12,10 @@
     justify-content: center;
     padding: 20px;
     margin: 0;
-    overflow-x: auto; /* BIAR BISA SCROLL KESAMPING DI HP */
   }
 .container {
-    width: 750px; /* KUNCI LEBARNYA */
-    min-width: 750px; /* JANGAN MAU MENGECIL */
+    width: 100%;
+    max-width: 750px; /* FORM ADAPTIF SAMPAI 750px */
     background: white;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
@@ -64,7 +63,13 @@
     background: rgba(255,255,255,0.8);
   }
 
+  /* INI BAGIAN HASIL SURAT YANG DIKUNCI */
+.paper-wrapper {
+    overflow-x: auto; /* BISA SCROLL KESAMPING */
+  }
 .paper {
+    width: 750px; /* KUNCI LEBAR 750px */
+    min-width: 750px;
     background: #fefcf3;
     background-image: repeating-linear-gradient(#cce0ff 0px, #cce0ff 1px, transparent 1px, transparent 28px);
     padding: 50px 60px;
@@ -73,6 +78,7 @@
     color: #111;
     text-align: justify;
     font-family: Arial, sans-serif;
+    box-sizing: border-box;
   }
 .title {
     text-align: center;
@@ -119,10 +125,10 @@
     z-index: 2;
   }
 
-  /* BUAT PRINT/PDF TETAP RAPI */
 @media print {
   body { background: white; padding: 0; }
- .container { box-shadow: none; width: 100%; min-width: 0; }
+.container { box-shadow: none; max-width: 100%; }
+.paper { width: 100%; min-width: 0; }
 }
 </style>
 </head>
@@ -130,7 +136,7 @@
 
 <div class="container">
 
-  <!-- SLIDE 1: INPUT DATA -->
+  <!-- SLIDE 1: INPUT DATA - TETAP ADAPTIF -->
   <div class="slide active" id="slide1">
     <h2>Isi Data Surat Lamaran</h2>
     <div class="form-group">
@@ -172,9 +178,11 @@
     </div>
   </div>
 
-  <!-- SLIDE 2: HASIL SURAT -->
+  <!-- SLIDE 2: HASIL SURAT - DIKUNCI 750px -->
   <div class="slide" id="slide2">
-    <div class="paper" id="hasilSurat"></div>
+    <div class="paper-wrapper"> <!-- WRAPPER BUAT SCROLL -->
+      <div class="paper" id="hasilSurat"></div>
+    </div>
     <div class="btn-group">
       <button class="btn-back" onclick="backSlide()">← Kembali</button>
       <button class="btn-print" onclick="window.print()">Print / Simpan PDF</button>
