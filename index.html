@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=750, user-scalable=yes, initial-scale=1.0"> <!-- KUNCI LEBAR 750px -->
 <title>Generator Surat Lamaran</title>
 <style>
   body {
@@ -11,9 +11,12 @@
     display: flex;
     justify-content: center;
     padding: 20px;
+    margin: 0;
+    overflow-x: auto; /* BIAR BISA SCROLL KESAMPING DI HP */
   }
 .container {
-    width: 750px;
+    width: 750px; /* KUNCI LEBARNYA */
+    min-width: 750px; /* JANGAN MAU MENGECIL */
     background: white;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
@@ -115,6 +118,12 @@
     border-radius: 0 0 12px 12px;
     z-index: 2;
   }
+
+  /* BUAT PRINT/PDF TETAP RAPI */
+@media print {
+  body { background: white; padding: 0; }
+ .container { box-shadow: none; width: 100%; min-width: 0; }
+}
 </style>
 </head>
 <body>
@@ -153,7 +162,7 @@
       <input type="text" id="posisi" placeholder="Contoh: Staff Admin">
     </div>
     <div class="form-group">
-      <label>8. Jurusan apa yang kamu ambil di sekolah?</label> <!-- UDAH DIGANTI -->
+      <label>8. Jurusan apa yang kamu ambil di sekolah?</label>
       <input type="text" id="jurusan" placeholder="Contoh: TKJ / RPL / DKV / OTKP">
     </div>
 
