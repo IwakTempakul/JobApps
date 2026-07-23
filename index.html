@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"> <!-- FORM TETAP ADAPTIF -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Generator Surat Lamaran</title>
 <style>
   body {
@@ -15,14 +15,13 @@
   }
 .container {
     width: 100%;
-    max-width: 750px; /* FORM ADAPTIF SAMPAI 750px */
+    max-width: 750px; /* FORM TETAP ADAPTIF */
     background: white;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     padding: 30px;
     position: relative;
     padding-bottom: 70px;
-    overflow: hidden;
   }
 
 .container::before {
@@ -57,19 +56,19 @@
     background: rgba(255,255,255,0.5);
     backdrop-filter: blur(2px);
   }
-  input:focus {
-    border-color: #4a90e2;
-    outline: none;
-    background: rgba(255,255,255,0.8);
-  }
 
-  /* INI BAGIAN HASIL SURAT YANG DIKUNCI */
-.paper-wrapper {
-    overflow-x: auto; /* BISA SCROLL KESAMPING */
+  /* KUNCI BUAT HASIL KAYAK PDF */
+.paper-canvas {
+    width: 100%;
+    overflow-x: auto; /* BISA GESER KALAU LEBAR */
+    padding: 10px 0;
+    background: #ddd; /* BACKGROUND ABU2 KAYAK APLIKASI PDF */
+    border-radius: 8px;
   }
 .paper {
-    width: 750px; /* KUNCI LEBAR 750px */
-    min-width: 750px;
+    width: 750px; /* UKURAN KERTAS DIKUNCI */
+    min-height: 1056px; /* TINGGI KAYA A4 */
+    margin: 0 auto;
     background: #fefcf3;
     background-image: repeating-linear-gradient(#cce0ff 0px, #cce0ff 1px, transparent 1px, transparent 28px);
     padding: 50px 60px;
@@ -79,6 +78,7 @@
     text-align: justify;
     font-family: Arial, sans-serif;
     box-sizing: border-box;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2); /* BAYANGAN KAYAK KERTAS */
   }
 .title {
     text-align: center;
@@ -127,8 +127,9 @@
 
 @media print {
   body { background: white; padding: 0; }
-.container { box-shadow: none; max-width: 100%; }
-.paper { width: 100%; min-width: 0; }
+.container { box-shadow: none; max-width: 100%; padding: 0; }
+.paper-canvas { background: white; overflow: visible; }
+.paper { width: 100%; min-height: auto; box-shadow: none; }
 }
 </style>
 </head>
@@ -136,51 +137,24 @@
 
 <div class="container">
 
-  <!-- SLIDE 1: INPUT DATA - TETAP ADAPTIF -->
+  <!-- SLIDE 1: INPUT DATA - ADAPTIF -->
   <div class="slide active" id="slide1">
     <h2>Isi Data Surat Lamaran</h2>
-    <div class="form-group">
-      <label>1. Siapa Nama Lengkapmu?</label>
-      <input type="text" id="nama" placeholder="Contoh: Budi Santoso">
-    </div>
-    <div class="form-group">
-      <label>2. Apa Alamat Lengkapmu?</label>
-      <input type="text" id="alamat" placeholder="Contoh: Jl. Merdeka No. 10, Samarinda">
-    </div>
-    <div class="form-group">
-      <label>3. Tanggal berapa surat ini dibuat?</label>
-      <input type="date" id="tanggal">
-    </div>
-    <div class="form-group">
-      <label>4. Siapa Nama HRD / Penerima Surat?</label>
-      <input type="text" id="hrd" placeholder="Contoh: Mr. John Doe">
-    </div>
-    <div class="form-group">
-      <label>5. Nama Perusahaannya?</label>
-      <input type="text" id="perusahaan" placeholder="Contoh: PT Maju Jaya">
-    </div>
-    <div class="form-group">
-      <label>6. Alamat Perusahaan?</label>
-      <input type="text" id="alamatPerusahaan" placeholder="Contoh: Jl. Gatot Subroto No. 5, Jakarta">
-    </div>
-    <div class="form-group">
-      <label>7. Posisi apa yang kamu lamar?</label>
-      <input type="text" id="posisi" placeholder="Contoh: Staff Admin">
-    </div>
-    <div class="form-group">
-      <label>8. Jurusan apa yang kamu ambil di sekolah?</label>
-      <input type="text" id="jurusan" placeholder="Contoh: TKJ / RPL / DKV / OTKP">
-    </div>
+    <div class="form-group"><label>1. Siapa Nama Lengkapmu?</label><input type="text" id="nama" placeholder="Contoh: Budi Santoso"></div>
+    <div class="form-group"><label>2. Apa Alamat Lengkapmu?</label><input type="text" id="alamat" placeholder="Contoh: Jl. Merdeka No. 10, Samarinda"></div>
+    <div class="form-group"><label>3. Tanggal berapa surat ini dibuat?</label><input type="date" id="tanggal"></div>
+    <div class="form-group"><label>4. Siapa Nama HRD / Penerima Surat?</label><input type="text" id="hrd" placeholder="Contoh: Mr. John Doe"></div>
+    <div class="form-group"><label>5. Nama Perusahaannya?</label><input type="text" id="perusahaan" placeholder="Contoh: PT Maju Jaya"></div>
+    <div class="form-group"><label>6. Alamat Perusahaan?</label><input type="text" id="alamatPerusahaan" placeholder="Contoh: Jl. Gatot Subroto No. 5, Jakarta"></div>
+    <div class="form-group"><label>7. Posisi apa yang kamu lamar?</label><input type="text" id="posisi" placeholder="Contoh: Staff Admin"></div>
+    <div class="form-group"><label>8. Jurusan apa yang kamu ambil di sekolah?</label><input type="text" id="jurusan" placeholder="Contoh: TKJ / RPL / DKV / OTKP"></div>
 
-    <div class="btn-group">
-      <div></div>
-      <button class="btn-next" onclick="nextSlide()">Next →</button>
-    </div>
+    <div class="btn-group"><div></div><button class="btn-next" onclick="nextSlide()">Next →</button></div>
   </div>
 
-  <!-- SLIDE 2: HASIL SURAT - DIKUNCI 750px -->
+  <!-- SLIDE 2: HASIL SURAT - KAYAK PDF -->
   <div class="slide" id="slide2">
-    <div class="paper-wrapper"> <!-- WRAPPER BUAT SCROLL -->
+    <div class="paper-canvas"> <!-- INI KANVASNYA BISA DI ZOOM -->
       <div class="paper" id="hasilSurat"></div>
     </div>
     <div class="btn-group">
@@ -212,38 +186,15 @@
     }
 
     document.getElementById('hasilSurat').innerHTML = `
-      <div class="title">
-        Job Application Letter for No <br>
-        Experience (Fresh Graduate)
-      </div>
-      <div class="section">
-        ${data.nama}<br>
-        ${data.alamat}<br>
-        ${data.tanggal}
-      </div>
-      <div class="section">
-        ${data.hrd}<br>
-        ${data.perusahaan}<br>
-        ${data.alamatPerusahaan}
-      </div>
-      <div class="section">
-        Dear ${data.hrd},
-      </div>
-      <div class="section">
-        I am writing to express my interest in the ${data.posisi} position at ${data.perusahaan}. As a recent graduate in ${data.jurusan}, I am eager to apply my academic knowledge and skills in a professional environment.
-      </div>
-      <div class="section">
-        During my studies, I developed strong communication skills, teamwork abilities, and a willingness to learn through coursework and projects.
-      </div>
-      <div class="section">
-        I am highly motivated to grow, learn, and contribute positively to your organization.
-      </div>
-      <div class="section signature-space">
-        Sincerely,
-      </div>
-      <div class="section">
-        ${data.nama}
-      </div>
+      <div class="title">Job Application Letter for No <br> Experience (Fresh Graduate)</div>
+      <div class="section">${data.nama}<br>${data.alamat}<br>${data.tanggal}</div>
+      <div class="section">${data.hrd}<br>${data.perusahaan}<br>${data.alamatPerusahaan}</div>
+      <div class="section">Dear ${data.hrd},</div>
+      <div class="section">I am writing to express my interest in the ${data.posisi} position at ${data.perusahaan}. As a recent graduate in ${data.jurusan}, I am eager to apply my academic knowledge and skills in a professional environment.</div>
+      <div class="section">During my studies, I developed strong communication skills, teamwork abilities, and a willingness to learn through coursework and projects.</div>
+      <div class="section">I am highly motivated to grow, learn, and contribute positively to your organization.</div>
+      <div class="section signature-space">Sincerely,</div>
+      <div class="section">${data.nama}</div>
     `;
 
     document.getElementById('slide1').classList.remove('active');
