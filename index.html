@@ -14,16 +14,16 @@ h2 { text-align: center; margin-bottom: 20px; }
 .form-group { margin-bottom: 16px; }
 label { font-weight: 600; display: block; margin-bottom: 6px; }
 input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 15px; box-sizing: border-box; background: rgba(255,255,255,0.5); }
-.toolbar { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; background: #eee; padding: 8px; border-radius: 8px; flex-wrap: wrap; }
-.toolbar button { padding: 8px 12px; font-size: 13px; background: #4a90e2; color: white; border: none; border-radius: 6px; cursor: pointer; }
-.paper-canvas { width: 100%; overflow: hidden; background: #ddd; border-radius: 8px; height: 600px; position: relative; cursor: grab; touch-action: none; }
+.toolbar { display: flex; gap: 8px; justify-content: flex-start; margin-bottom: 10px; background: #eee; padding: 8px; border-radius: 8px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+.toolbar button { padding: 8px 12px; font-size: 13px; background: #4a90e2; color: white; border: none; border-radius: 6px; cursor: pointer; flex-shrink: 0; }
+.paper-canvas { width: 100%; overflow: hidden; background: #ddd; border-radius: 8px; height: 60vh; /* GANTI: biar responsif di HP */ max-height: 600px; position: relative; cursor: grab; touch-action: none; }
 .paper-canvas.grabbing { cursor: grabbing; }
 .paper { width: 750px; height: 1056px; position: absolute; top: 0; left: 0; background: #fefcf3; background-image: repeating-linear-gradient(#cce0ff 0px, #cce0ff 1px, transparent 1px, transparent 28px); padding: 50px 60px; line-height: 28px; font-size: 15px; color: #111; text-align: justify; box-sizing: border-box; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
 .title { text-align: center; font-weight: 700; font-size: 18px; margin-bottom: 24px; text-transform: uppercase; line-height: 1.5; }
 .section { margin-bottom: 18px; }
 .signature-space { margin-bottom: 56px; }
-.btn-group { display: flex; justify-content: space-between; margin-top: 20px; }
-.main-btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; }
+.btn-group { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
+.main-btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; flex: 1; }
 .btn-next { background: #4a90e2; color: white; }
 .btn-back { background: #ccc; color: #333; }
 .btn-print { background: #27ae60; color: white; }
@@ -84,25 +84,20 @@ body { background: white; padding: 0; }
     const cw = canvas.clientWidth;
     const ch = canvas.clientHeight;
     const isRotated = currentRotate % 180!== 0;
-
-    // ukuran kertas setelah di scale
     const pw = 750 * currentScale;
     const ph = 1056 * currentScale;
     const w = isRotated? ph : pw;
     const h = isRotated? pw : ph;
 
     if(isRotated){
-      // KALAU ROTATE: ACUAN TENGAH + ORIGIN TENGAH
       paper.style.transformOrigin = 'center center';
-      posX = cw/2 - w/2; // center horizontal
-      posY = ch/2 - h/2; // center vertikal
+      posX = cw/2 - w/2;
+      posY = ch/2 - h/2;
     } else {
-      // KALAU NORMAL: ACUAN KIRI ATAS + ORIGIN KIRI ATAS
       paper.style.transformOrigin = '0 0';
-      posX = (cw - pw) / 2; // center horizontal aja
-      posY = 0; // tempel atas
+      posX = (cw - pw) / 2;
+      posY = 0;
     }
-
     paper.style.transform = `translate(${posX}px, ${posY}px) scale(${currentScale}) rotate(${currentRotate}deg)`;
   }
 
@@ -111,14 +106,12 @@ body { background: white; padding: 0; }
   function zoomReset() { currentScale = 1; currentRotate = 0; updatePaper(); }
   function rotatePaper() { currentRotate = (currentRotate + 90) % 360; updatePaper(); }
 
-  // PANNING
   canvas.addEventListener('mousedown', e => { isDragging = true; canvas.classList.add('grabbing'); startX = e.clientX - posX; startY = e.clientY - posY; });
   window.addEventListener('mousemove', e => { if(!isDragging) return; posX = e.clientX - startX; posY = e.clientY - startY; paper.style.transform = `translate(${posX}px, ${posY}px) scale(${currentScale}) rotate(${currentRotate}deg)`; });
   window.addEventListener('mouseup', () => { isDragging = false; canvas.classList.remove('grabbing'); });
   canvas.addEventListener('touchstart', e => { isDragging = true; startX = e.touches[0].clientX - posX; startY = e.touches[0].clientY - posY; });
   canvas.addEventListener('touchmove', e => { if(!isDragging) return; posX = e.touches[0].clientX - startX; posY = e.touches[0].clientY - startY; paper.style.transform = `translate(${posX}px, ${posY}px) scale(${currentScale}) rotate(${currentRotate}deg)`; });
   canvas.addEventListener('touchend', () => { isDragging = false; });
-
   let lastDist = 0;
   canvas.addEventListener('touchmove', e => { if(e.touches.length === 2) { const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); if(lastDist!== 0) { if(dist > lastDist && currentScale < 2) currentScale += 0.01; if(dist < lastDist && currentScale > 0.5) currentScale -= 0.01; updatePaper(); } lastDist = dist; } });
   canvas.addEventListener('touchend', () => { lastDist = 0; });
